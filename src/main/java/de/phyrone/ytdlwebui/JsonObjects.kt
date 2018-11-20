@@ -21,26 +21,30 @@ abstract class RestItem(val id: Int) {
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-open class IdRestItem() : RestItem(0) {
-
-}
+open class IdRestItem : RestItem(0)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class RequestDownloadJson() : RestItem(PacketType.DOWNLOADREQUEST) {
+class RequestDownloadJson : RestItem(PacketType.DOWNLOADREQUEST) {
     lateinit var url: String
-    var quality = Quality.AUDIO
+    var profile = defaultProfileName
 }
 
-class AddVideoJson(val videoID: String, val url: String,val title: String) : RestItem(PacketType.ADDVIDEO)
+class AddVideoJson(val videoID: String, val url: String, val title: String) : RestItem(PacketType.ADDVIDEO)
 
-class UpdateDownloadJson(val videoID: String, val percent: Int) : RestItem(PacketType.UPDATEVIDEO)
+class UpdateDownloadJson(val videoID: String, val percent: Float) : RestItem(PacketType.UPDATEVIDEO)
 
-class UpdateStatusJson(val videoID: String, val stats: Status) : RestItem(PacketType.SETSTATUS) {
+class DownloadResultJson(val videoID: String, val state: Status) : RestItem(PacketType.SETSTATUS) {
     enum class Status {
-        DOWNLOAD, FAILED, FINISH, QUEUED
+        FAILED, FINISH
     }
 }
 
 enum class PacketType(val id: Int) {
     DOWNLOADREQUEST(31), UPDATEVIDEO(32), ADDVIDEO(30), SETSTATUS(33)
+}
+
+class DownloadInfoJson(val name: String, val type: String) {
+    override fun toString(): String {
+        return mapper.writeValueAsString(this)
+    }
 }

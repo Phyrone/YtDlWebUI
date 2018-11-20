@@ -3,17 +3,12 @@ package de.phyrone.ytdlwebui
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.call
 import io.ktor.application.install
-import io.ktor.auth.Authentication
-import io.ktor.auth.UserIdPrincipal
-import io.ktor.auth.authenticate
-import io.ktor.auth.basic
 import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
 import io.ktor.freemarker.FreeMarkerContent
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText
-import io.ktor.http.cio.websocket.send
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.response.respond
@@ -23,7 +18,6 @@ import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.sessions.*
 import io.ktor.websocket.WebSockets
 import io.ktor.websocket.webSocket
 import kotlinx.coroutines.CoroutineScope
@@ -39,6 +33,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
+
 fun main(args: Array<String>) {
     CommandLine.run(ServerBootstrap, *args)
 }
@@ -52,10 +47,6 @@ object ServerBootstrap : Runnable {
 
     val sessionName = config[Sel.sessionName]
     val sessionFile = File("sessions")
-
-
-    @CommandLine.Option(names = ["--reset-admin"])
-    var reset = false
 
     init {
         sessionFile.mkdirs()
@@ -85,28 +76,6 @@ object ServerBootstrap : Runnable {
                 minimumSize(1024) // condition
             }
         }
-        install(Authentication) {
-            basic {
-                skipWhen {
-                    return@skipWhen !AuthManager.enabled
-                }
-                validate { cred ->
-                    return@validate if (cred.name.startsWith("GG-")) {
-                        UserIdPrincipal(cred.name)
-                    } else {
-                        null
-                    }
-
-                }
-            }
-        }
-        install(Sessions) {
-
-            cookie<WebSession>(sessionName, directorySessionStorage(sessionFile, true)) {
-                cookie.duration = Duration.ofHours(2)
-
-            }
-        }
         routing {
             static("/assets") {
                 resources("/web/assets")
@@ -114,18 +83,6 @@ object ServerBootstrap : Runnable {
 
 
             route("/api") {
-                route("/session") {
-                    get("/invalidate") {
-                        call.sessions.clear(sessionName)
-                        call.respond("Session Invalidated!")
-                    }
-                    get("/uuid") {
-                        val ses: WebSession = call.sessions.getOrSet {
-                            WebSession()
-                        }
-                        call.respond(ses.uuid.toString())
-                    }
-                }
                 webSocket("/ws") {
                     try {
                         while (true) {
@@ -146,19 +103,34 @@ object ServerBootstrap : Runnable {
                     }
                 }
             }
-            authenticate {
-                get("/") {
-                    val model = mapOf("title" to "Title")
-                    call.respond(FreeMarkerContent("downloadpage.ftl", model))
+
+            get("/") {
+                val model = mapOf("title" to "Title",
+                        "defaultprofilename" to defaultProfileName,
+                        "profilesDropdown" to profilesHtml
+                )
+                call.respond(FreeMarkerContent("downloadpage.ftl", model))
+            }
+            get("/download") {
+                val id = call.request.queryParameters["id"] ?: ""
+                val file = DownloadBackend.getFile(id)
+                if (file == null) {
+                    call.respond(HttpStatusCode(404, "Not Found"), "Download not Found")
+                } else {
+                    call.respondFile(file)
                 }
-                get("/download") {
-                    val id = call.request.queryParameters["id"] ?: ""
-                    val file = DownloadBackend.getFile(id)
-                    if (file == null) {
-                        call.respond(HttpStatusCode(404, "Not Found"), "Download not Found")
-                    } else {
-                        call.respondFile(file)
-                    }
+            }
+            get("/download/info") {
+                val id = call.request.queryParameters["id"] ?: ""
+                val file = DownloadBackend.getFile(id)
+                if (file == null) {
+                    call.respond(HttpStatusCode(404, "Not Found"), "No Info Found")
+                } else {
+
+                    call.respond(DownloadInfoJson(
+                            file.name,
+                            DownloadBackend.getMimeType(file)
+                    ).toString())
                 }
             }
 
@@ -167,7 +139,6 @@ object ServerBootstrap : Runnable {
     }
 
     override fun run() {
-        DB.openDatabase()
         webserver.start(true)
 
     }
@@ -179,8 +150,13 @@ object ServerBootstrap : Runnable {
 
 }
 
-class WebSession(val uuid: UUID = UUID.randomUUID()) {
-
+val profilesHtml = profilesToDropdown()
+fun profilesToDropdown(): String {
+    val stringBuilder = StringBuilder()
+    profiles.forEach {
+        stringBuilder.append("<a class=\"dropdown-item\" onclick=\"onDownloadRequest('" + it.key + "')\">" + it.key + "</a>")
+    }
+    return stringBuilder.toString()
 }
 
 
