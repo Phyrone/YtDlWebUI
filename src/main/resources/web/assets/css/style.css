@@ -1,0 +1,19 @@
+.center {
+    padding: 10px 5px;
+    border: 0 solid;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.background {
+    background: #4e555b url("../img/turntable-1109588_1920.jpg");
+}
+
+.downloadBox {
+    background-color: #685353 ;
+    border: solid rgba(0, 0, 0, 0.69);
+    margin: 0;
+    padding: 10px;
+    border-radius: 10px;
+}
