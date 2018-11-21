@@ -30,6 +30,10 @@ fun genID(): String {
 }
 
 object DownloadBackend {
+    init {
+        YoutubeDL.setExecutablePath(config[Sel.youtubeDLPath])
+    }
+
     fun getMimeType(file: File): String {
         return tika.detect(file)
     }
