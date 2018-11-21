@@ -1,5 +1,5 @@
 const dwUrl = "/download";
-const isSecrure = window.location.protocol.toLowerCase() === "https";
+const isSecrure = window.location.protocol.toLowerCase() === "https:";
 const regex = /(http|https):\/\/(\w+:?\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
 
 function getWsProtokol() {
