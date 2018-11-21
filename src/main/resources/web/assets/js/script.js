@@ -9,7 +9,7 @@ function getWsProtokol() {
         return "ws";
 }
 
-const wsUrl = getWsProtokol + "://" + window.location.host + "/" + location.pathname + "/api/ws";
+const wsUrl = getWsProtokol() + "://" + window.location.host + "/" + location.pathname + "/api/ws";
 console.log("Ws-Url: " + wsUrl);
 websocket = new WebSocket(wsUrl);
 
