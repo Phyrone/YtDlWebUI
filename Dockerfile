@@ -1,9 +1,10 @@
-FROM ubuntu:18.10
+FROM openjdk:11-jdk
 WORKDIR /app/
 COPY . /build/
 RUN apt-get update -y
-RUN apt-get install atomicparsley ffmpeg openjdk-11-jdk maven -y
+RUN apt-get install atomicparsley ffmpeg maven python-pip -y
+RUN pip install --upgrade youtube-dl
 RUN cd /build/ && mvn install && cp /build/target/YtDlServer.jar /bin/Server.jar
-RUN apt-get remove openjdk-11-jdk -y
-RUN apt-get install openjdk-11-jre -y
+RUN apt-get remove maven -y
+RUN rm /build/ -R
 CMD java -jar /bin/Server.jar
