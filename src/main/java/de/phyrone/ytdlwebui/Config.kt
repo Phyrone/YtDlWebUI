@@ -15,12 +15,14 @@ private fun loadConfig(): Config {
         addSpec(YTDLSel)
         addSpec(NetworkSel)
     }
+    ret = ret.from.env()
     if (cfgFile.exists()) {
         ret = ret.from.toml.file(cfgFile)
     }
     GlobalScope.launch(Dispatchers.IO) {
         ret.toToml.toFile(cfgFile)
     }
+    ret = ret.from.systemProperties()
     return ret
 }
 
