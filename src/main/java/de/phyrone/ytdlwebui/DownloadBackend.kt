@@ -85,7 +85,8 @@ class DownloadRequest(val url: String, val profileName: String, val defaultWebSo
                     cmdArray.forEach {
                         if (it.contains(" ")) {
                             val spl = it.split(" ")
-                            req.setOption(spl[0], spl[1])
+                            req.setOption(spl[0], spl.subList(1, spl.size).joinToString(" "))
+
                         } else {
                             req.setOption(it)
                         }

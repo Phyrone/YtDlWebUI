@@ -1,6 +1,15 @@
-const wsUrl = "ws://" + window.location.host + "/" + location.pathname + "/api/ws";
 const dwUrl = "/download";
+const isSecrure = window.location.protocol.toUpperCase() === "https";
 const regex = /(http|https):\/\/(\w+:?\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+
+function getWsProtokol() {
+    if (isSecrure)
+        return "wss";
+    else
+        return "ws";
+}
+
+const wsUrl = getWsProtokol + "://" + window.location.host + "/" + location.pathname + "/api/ws";
 console.log("Ws-Url: " + wsUrl);
 websocket = new WebSocket(wsUrl);
 
