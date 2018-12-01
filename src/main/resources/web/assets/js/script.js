@@ -1,6 +1,7 @@
 const dwUrl = "/download";
 const isSecrure = window.location.protocol.toLowerCase() === "https:";
 const regex = /(http|https):\/\/(\w+:?\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+const downloadText = "Download";
 
 function getWsProtokol() {
     if (isSecrure)
@@ -85,21 +86,22 @@ async function setDownloadFailed(id) {
 
 async function setDownloadBTM(id) {
     let element = document.getElementById("state-row-" + id);
-    element.innerHTML = "<button class=\"btn btn-block btn-success\" onclick='downloadContent(\"" + id + "\")'>Download</button>"
+    element.innerHTML = "<button class=\"btn btn-block btn-success\" onclick='downloadContent(\"" + id + "\",this)'>" + downloadText + "</button>"
 }
 
-async function downloadContent(id) {
+async function downloadContent(id, btm) {
     const downloadURL = dwUrl + "?id=" + id;
     console.log("Downloading " + id + "...");
+    btm.innerHTML = "<div class=\"lds-facebook\"><div></div><div></div><div></div></div>";
     let infoReq = new XMLHttpRequest();
     infoReq.open("GET", dwUrl + "/info?id=" + id, true);
-
     infoReq.onload = function (e) {
         let info = JSON.parse(infoReq.response);
         let x = new XMLHttpRequest();
         x.open("GET", downloadURL, true);
         x.responseType = 'blob';
         x.onload = function (e) {
+            btm.innerHTML = downloadText;
             download(x.response, info.name, info.type);
         };
         x.send();
