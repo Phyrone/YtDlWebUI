@@ -2,6 +2,7 @@
 # YtDlWebUI
 YoutubeDL-WebUI is one oft many Web-UI's for [YoutubeDL](https://rg3.github.io/youtube-dl/)
 ## TODO
+- [ ] Fancyer WebUI
 - [ ] Playlist Support
 - [ ] Configurable Settings (CSS,Background,Messages)
 - [ ] Android App
