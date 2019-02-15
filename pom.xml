@@ -6,7 +6,7 @@
 
     <groupId>de.phyrone</groupId>
     <artifactId>YtDlWebUI</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>alpha-0.3</version>
     <repositories>
         <repository>
             <id>ktor</id>
