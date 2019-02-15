@@ -57,6 +57,7 @@ object ServerBootstrap : Runnable {
 
     val webserver = embeddedServer(
             factory = Netty,
+            host = config[NetworkSel.host],
             port = config[NetworkSel.port]
     ) {
         install(WebSockets) {

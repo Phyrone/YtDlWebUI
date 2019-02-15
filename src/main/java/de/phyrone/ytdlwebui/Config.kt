@@ -7,13 +7,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 private val cfgFile = File("Config.toml")
 private fun loadConfig(): Config {
     var ret = Config {
+        addSpec(NetworkSel)
         addSpec(Sel)
         addSpec(YTDLSel)
-        addSpec(NetworkSel)
     }
     ret = ret.from.env()
     if (cfgFile.exists()) {
@@ -30,6 +31,8 @@ val config = loadConfig()
 
 object Sel : ConfigSpec() {
     val sessionName by optional("YTDL-Session", "SessionName")
+    val expireTime by optional(2,"TempFiles.ExpireTime")
+    val expireTimeUnit by optional(TimeUnit.HOURS,"TempFiles.ExpireTimeUnit")
     val youtubeDLPath by optional("youtube-dl", "YoutubeDL.ExecPath")
 }
 
@@ -48,6 +51,7 @@ object YTDLSel : ConfigSpec("YoutubeDL") {
 
 object NetworkSel : ConfigSpec("Network") {
     val port by optional(8080, "Port")
+    val host by optional("0.0.0.0","Host")
 }
 
 

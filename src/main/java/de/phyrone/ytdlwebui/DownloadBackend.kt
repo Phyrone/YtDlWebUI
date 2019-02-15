@@ -1,5 +1,8 @@
 package de.phyrone.ytdlwebui
 
+import com.google.common.base.Charsets
+import com.google.common.hash.Hashing
+import com.google.common.io.BaseEncoding
 import com.sapher.youtubedl.YoutubeDL
 import com.sapher.youtubedl.YoutubeDLRequest
 import io.ktor.http.cio.websocket.send
@@ -11,7 +14,8 @@ import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-val randomDownloadID = RandomString(128)
+val hasher = Hashing.sha256()
+val base64 = BaseEncoding.base64()
 val requests = HashMap<String, DownloadRequest>()
 val logUpdateExecutor = Executors.newCachedThreadPool()
 val defaultArgs = config[YTDLSel.defaultArgs]
@@ -21,13 +25,7 @@ val profiles = config[YTDLSel.profiles]
 val defaultProfile = config[YTDLSel.defaultProfileArgs]
 val defaultProfileName = config[YTDLSel.defaultProfileName]
 val tika = Tika()
-fun genID(): String {
-    var ret = randomDownloadID.nextString()
-    while (requests.containsKey(ret)) {
-        ret = randomDownloadID.nextString()
-    }
-    return ret
-}
+
 
 object DownloadBackend {
     init {
@@ -53,6 +51,7 @@ object DownloadBackend {
 }
 
 val tempParentFile = File("temp/").also {
+    if (it.exists()) it.deleteRecursively()
     it.mkdirs()
     Runtime.getRuntime().addShutdownHook(Thread {
         it.deleteRecursively()
@@ -60,12 +59,17 @@ val tempParentFile = File("temp/").also {
 }
 
 class DownloadRequest(val url: String, val profileName: String, val defaultWebSocketServerSession: DefaultWebSocketServerSession) : Runnable {
+    fun genID() = base64.encode(hasher.newHasher().putString(url, Charsets.UTF_8).putString(profileName, Charsets.UTF_8).hash().asBytes())
+
+    var lastUse = System.currentTimeMillis()
     val id = genID()
     var finished = false
     val time = System.currentTimeMillis()
     private val tempFile = File(tempParentFile.path, id).also {
         it.mkdirs()
     }
+
+
     var file: File? = null
     override fun run() {
         runBlocking {
