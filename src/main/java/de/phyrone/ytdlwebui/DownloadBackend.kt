@@ -59,7 +59,7 @@ val tempParentFile = File("temp/").also {
 }
 
 class DownloadRequest(val url: String, val profileName: String, val defaultWebSocketServerSession: DefaultWebSocketServerSession) : Runnable {
-    fun genID() = base64.encode(hasher.newHasher().putString(url, Charsets.UTF_8).putString(profileName, Charsets.UTF_8).hash().asBytes())
+    fun genID() = base64.encode(hasher.newHasher().putString(url, Charsets.UTF_8).putString(profileName, Charsets.UTF_8).hash().asBytes()).replace("/", "\\/").replace("\\", "\\\\")
 
     var lastUse = System.currentTimeMillis()
     val id = genID()
