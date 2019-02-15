@@ -6,11 +6,13 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/fontawesome.min.css">
+    <link rel="stylesheet" href="assets/css/sweetalert2.all.min.js">
     <link rel="prefetch" href="assets/img/turntable-1109588_1920.jpg">
     <script src="assets/js/JQuerry.js"></script>
     <script src="assets/js/PropperJS.js"></script>
     <script src="assets/js/download.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/sweetalert2.all.js"></script>
     <script src="assets/js/script.js"></script>
 </head>
 <body class="background">
@@ -37,7 +39,7 @@
                             <span class="sr-only">Toggle Dropdown</span>
                         </button>
                         <div class="dropdown-menu">
-                        ${profilesDropdown}
+                            ${profilesDropdown}
                         </div>
                     </div>
                 </div>

@@ -20,6 +20,16 @@ websocket.onopen = function () {
     console.log("Websocket Connected!");
     maybeReady();
 };
+websocket.onerror = async function () {
+    Swal.fire({
+        type: 'warning',
+        title: 'Connection Lost!',
+        showCancelButton: false,
+        confirmButtonText: 'Reload Page'
+    }).then(() => {
+        location.reload(false)
+    })
+};
 let ready = false;
 let wsReady = false;
 let pageReady = false;
@@ -59,12 +69,20 @@ async function createDownloadItemFromPacket(packet) {
 }
 
 async function createDownloadItem(id, title, url) {
+    let taskName = "task-" + id;
+    if (document.getElementById("tr-" + id) != null) {
+        $('.' + taskName).each(function (i, element) {
+            element.outerHTML = ""
+        })
+    }
+
+
     console.log("Create DonwloadItem: " + id);
     let e = document.getElementById("downloads-table");
     e.innerHTML = e.innerHTML +
-        "<tr id='tr-" + id + "'><td>" + title + "</td>" +
-        "<td>" + url + "</td>" +
-        "<td id='state-row-" + id + "'>" + getProgressbar(id) + "</td></tr>"
+        "<tr id='tr-" + id + "' class='" + taskName + "'><td>" + title + "</td>" +
+        "<td class='" + taskName + "'>" + url + "</td>" +
+        "<td id='state-row-" + id + "' class='" + taskName + "'>" + getProgressbar(id) + "</td></tr>"
 }
 
 async function handlePacket33(packet) {
@@ -80,8 +98,15 @@ async function handlePacket33(packet) {
 
 async function setDownloadFailed(id) {
     let element = document.getElementById("tr-" + id);
-    element.classList.add("table-danger");
-    document.getElementById("state-row-" + id).innerHTML = "FAILED<button type=\"button\" class=\"close\"></button><span aria-hidden=\"true\">&times;</span>"
+    if (element == null) {
+        Swal.fire({
+            type: 'error',
+            title: 'Start Download Failed'
+        })
+    } else {
+        element.classList.add("table-danger");
+        document.getElementById("state-row-" + id).innerHTML = "FAILED<button type=\"button\" class=\"close\"></button><span aria-hidden=\"true\">&times;</span>"
+    }
 }
 
 async function setDownloadBTM(id) {
@@ -100,7 +125,7 @@ async function downloadContent(id, btm) {
         let x = new XMLHttpRequest();
         x.open("GET", downloadURL, true);
         x.responseType = 'blob';
-        x.onload = function (e) {
+        x.onload = async function () {
             btm.innerHTML = downloadText;
             download(x.response, info.name, info.type);
         };
