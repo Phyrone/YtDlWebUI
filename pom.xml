@@ -80,7 +80,7 @@
         <dependency>
             <groupId>com.uchuhimo</groupId>
             <artifactId>konf</artifactId>
-            <version>0.12</version>
+            <version>0.13</version>
         </dependency>
         <dependency>
             <groupId>info.picocli</groupId>
@@ -106,7 +106,7 @@
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.19.1</version>
+            <version>1.20</version>
         </dependency>
     </dependencies>
 
@@ -159,8 +159,7 @@
                             <shadedArtifactAttached>false</shadedArtifactAttached>
                             <minimizeJar>true</minimizeJar>
                             <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>de.phyrone.ytdlwebui.ServerKt</mainClass>
                                 </transformer>
                             </transformers>
