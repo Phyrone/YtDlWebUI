@@ -80,7 +80,7 @@
         <dependency>
             <groupId>com.uchuhimo</groupId>
             <artifactId>konf</artifactId>
-            <version>0.13</version>
+            <version>0.23.0</version>
         </dependency>
         <dependency>
             <groupId>info.picocli</groupId>
